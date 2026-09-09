@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lilith Rant Studio</title>
+<style>
+  :root{
+    --violet:#7c3aed;
+    --violet-dark:#2a0f4d;
+    --gold:#d4af37;
+    --gold-soft:#f3d98b;
+    --ink:#0f0a1a;
+    --panel:#1a1230;
+    --panel2:#241a3d;
+    --eve:#e8b74f;
+    --text:#f2ecff;
+    --muted:#b6a8d9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Georgia', 'Times New Roman', serif;
+    background:linear-gradient(160deg,var(--ink) 0%, var(--violet-dark) 55%, #3a1a55 100%);
+    color:var(--text);
+    min-height:100vh;
+  }
+  header{
+    text-align:center;
+    padding:24px 16px 12px;
+    background:radial-gradient(ellipse at top, rgba(212,175,55,0.15), transparent 70%);
+    border-bottom:1px solid rgba(212,175,55,0.3);
+  }
+  header h1{
+    font-size:clamp(1.6rem,5vw,2.6rem);
+    margin:0;
+    letter-spacing:2px;
+    background:linear-gradient(90deg,var(--gold-soft),var(--gold),var(--eve));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  header p{color:var(--muted);margin:6px 0 0;font-style:italic;}
+
+  nav.tabs{
+    display:flex;flex-wrap:wrap;gap:6px;
+    padding:10px;justify-content:center;
+    background:rgba(0,0,0,0.25);
+    position:sticky;top:0;z-index:10;
+    border-bottom:1px solid rgba(212,175,55,0.25);
+  }
+  nav.tabs button{
+    min-height:44px;min-width:44px;
+    padding:8px 14px;
+    border-radius:8px;
+    border:1px solid rgba(212,175,55,0.4);
+    background:var(--panel);
+    color:var(--text);
+    font-size:0.9rem;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  nav.tabs button.active{
+    background:linear-gradient(90deg,var(--violet),#5b1f9e);
+    border-color:var(--gold);
+  }
+
+  main{max-width:1100px;margin:0 auto;padding:16px;}
+  section.tabpanel{display:none;}
+  section.tabpanel.active{display:block;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid rgba(212,175,55,0.25);
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:16px;
+  }
+  .card h2{margin-top:0;color:var(--gold-soft);font-size:1.2rem;letter-spacing:1px;}
+  .card h3{color:var(--eve);margin-bottom:6px;}
+
+  label{display:block;margin:10px 0 4px;color:var(--muted);font-size:0.85rem;}
+  input[type=text], input[type=number], textarea, select{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid rgba(212,175,55,0.3);
+    background:#120c22;
+    color:var(--text);
+    font-family:inherit;
+    font-size:0.95rem;
+    min-height:44px;
+  }
+  textarea{min-height:70px;resize:vertical;}
+
+  button.btn{
+    min-height:44px;
+    padding:9px 16px;
+    border-radius:8px;
+    border:1px solid var(--gold);
+    background:linear-gradient(90deg,#3a1a55,#5b1f9e);
+    color:var(--gold-soft);
+    cursor:pointer;
+    font-family:inherit;
+    font-size:0.9rem;
+    margin:4px 6px 4px 0;
+  }
+  button.btn:hover{filter:brightness(1.15);}
+  button.btn.secondary{background:#241a3d;color:var(--muted);}
+  button.btn.eve{border-color:var(--eve);background:linear-gradient(90deg,#5a4315,#8a6a1f);color:#fff3d6;}
+  button.btn.danger{border-color:#c0405a;background:#4a1620;color:#ffd6de;}
+
+  .line-row{
+    border:1px solid rgba(212,175,55,0.2);
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:10px;
+    background:#150e28;
+  }
+  .line-row.lilith{border-left:4px solid var(--violet);}
+  .line-row.eve{border-left:4px solid var(--eve);}
+  .line-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+  .line-head strong{color:var(--gold-soft);}
+  .row-controls{display:flex;flex-wrap:wrap;gap:4px;}
+  .row-controls button{min-width:36px;min-height:36px;padding:4px 8px;font-size:0.85rem;}
+
+  .grid2{display:grid;grid-template-columns:1fr;gap:16px;}
+  @media(min-width:760px){.grid2{grid-template-columns:1fr 1fr;}}
+
+  .preview-stage{
+    position:relative;
+    border-radius:14px;
+    overflow:hidden;
+    min-height:320px;
+    background:linear-gradient(120deg,#12081f 0%, #2a0f4d 45%, #4a3312 100%);
+    border:1px solid rgba(212,175,55,0.35);
+    display:flex;align-items:flex-end;justify-content:center;
+  }
+  .preview-portraits{display:flex;width:100%;height:320px;justify-content:center;align-items:flex-end;gap:6px;padding-top:20px;}
+  .portrait-slot{
+    flex:1;max-width:300px;height:100%;
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;border-radius:10px;
+    background:rgba(0,0,0,0.2);
+    transition:transform 0.4s ease, filter 0.4s ease;
+  }
+  .portrait-slot img{width:100%;height:100%;object-fit:cover;}
+  .portrait-slot.speaking{transform:scale(1.04);filter:drop-shadow(0 0 18px var(--gold));}
+  .portrait-slot.dim{filter:brightness(0.55);}
+  .caption-bar{
+    position:absolute;bottom:0;left:0;right:0;
+    background:linear-gradient(0deg, rgba(0,0,0,0.85), transparent);
+    padding:16px 14px 10px;
+    text-align:center;
+  }
+  .caption-speaker{font-size:0.8rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;}
+  .caption-text{font-size:1.1rem;color:#fff;margin-top:4px;}
+  .caption-gesture{font-size:0.75rem;color:var(--muted);font-style:italic;margin-top:4px;}
+
+  .preview-controls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center;}
+
+  .prompt-box{
+    background:#120c22;border:1px dashed rgba(212,175,55,0.4);
+    border-radius:10px;padding:12px;font-size:0.85rem;color:var(--muted);
+    white-space:pre-wrap;margin-bottom:8px;
+  }
+
+  details{
+    background:#150e28;border:1px solid rgba(212,175,55,0.25);
+    border-radius:10px;padding:10px 14px;margin-bottom:12px;
+  }
+  details summary{cursor:pointer;color:var(--gold-soft);font-weight:bold;}
+  details p{color:var(--muted);line-height:1.5;font-size:0.9rem;}
+
+  .rant-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .rant-chip{
+    padding:6px 12px;border-radius:20px;border:1px solid rgba(212,175,55,0.4);
+    background:#241a3d;font-size:0.85rem;cursor:pointer;
+  }
+  .rant-chip.current{background:var(--violet);border-color:var(--gold);}
+
+  footer{text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;}
+  .limitation{font-size:0.75rem;color:#e0a1a1;margin-top:6px;}
+  .small-note{font-size:0.75rem;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="appTitleDisplay">LILITH RANT STUDIO</h1>
+  <p>violet night meets golden dawn — a short-form rant &amp; preview studio</p>
+</header>
+
+<nav class="tabs" id="tabNav">
+  <button data-tab="studio" class="active">Script Studio</button>
+  <button data-tab="preview">Preview</button>
+  <button data-tab="prompts">Visual Prompts</button>
+  <button data-tab="audio">Voice &amp; Ambience</button>
+  <button data-tab="saves">Save / Export</button>
+  <button data-tab="about">Fact Box &amp; Tools</button>
+</nav>
+
+<main>
+
+<!-- ============ STUDIO TAB ============ -->
+<section class="tabpanel active" id="tab-studio">
+  <div class="card">
+    <h2>Episode</h2>
+    <label for="rantTitle">Rant Title</label>
+    <input type="text" id="rantTitle" value="Tropical Astrology Is a Fake Weather Report">
+    <div class="grid2">
+      <div>
+        <label for="lilithName">Lilith's Display Name</label>
+        <input type="text" id="lilithName" value="Lilith">
+      </div>
+      <div>
+        <label for="eveName">Eve's Display Name</label>
+        <input type="text" id="eveName" value="Eve">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Dialogue Lines</h2>
+    <p class="small-note">Each line has a speaker, gesture, shot framing, and an optional pause. Reorder with the arrows. Nothing here is animated video — these are staging notes for your preview and prompt generation.</p>
+    <div id="lineList"></div>
+    <button class="btn" id="addLilithLine">+ Add Lilith Line</button>
+    <button class="btn eve" id="addEveLine">+ Add Eve Line</button>
+  </div>
+</section>
+
+<!-- ============ PREVIEW TAB ============ -->
+<section class="tabpanel" id="tab-preview">
+  <div class="card">
+    <h2>Preview Stage</h2>
+    <p class="small-note">Upload reference portraits for each character (used only in this browser session and, if small enough, saved with the rant). Playback simulates gesture and focus through framing and glow — this is a staging preview, not a real animation.</p>
+    <div class="grid2">
+      <div>
+        <label for="lilithImg">Lilith Portrait</label>
+        <input type="file" id="lilithImg" accept="image/*">
+      </div>
+      <div>
+        <label for="eveImg">Eve Portrait</label>
+        <input type="file" id="eveImg" accept="image/*">
+      </div>
+    </div>
+    <div class="preview-stage">
+      <div class="preview-portraits">
+        <div class="portrait-slot" id="lilithSlot"><span class="small-note">Lilith</span></div>
+        <div class="portrait-slot" id="eveSlot"><span class="small-note">Eve</span></div>
+      </div>
+      <div class="caption-bar">
+        <div class="caption-speaker" id="capSpeaker">—</div>
+        <div class="caption-text" id="capText">Press Play to preview the rant.</div>
+        <div class="caption-gesture" id="capGesture"></div>
+      </div>
+    </div>
+    <div class="preview-controls">
+      <button class="btn" id="playBtn">▶ Play Scene</button>
+      <button class="btn secondary" id="pauseBtn">⏸ Pause</button>
+      <button class="btn secondary" id="stopBtn">⏹ Stop</button>
+      <button class="btn secondary" id="prevLineBtn">⏮ Prev Line</button>
+      <button class="btn secondary" id="nextLineBtn">⏭ Next Line</button>
+    </div>
+    <p class="limitation">Limitation: standalone browser HTML cannot render true facial animation or lip-sync. This preview uses framing, scale, glow, and captions to imply motion. Use the Prompts tab to generate prompts for external tools.</p>
+  </div>
+</section>
+
+<!-- ============ PROMPTS TAB ============ -->
+<section class="tabpanel" id="tab-prompts">
+  <div class="card">
+    <h2>Realistic Visual Prompt Generator</h2>
+    <h3>Lilith Prompt</h3>
+    <div class="prompt-box" id="promptLilith">Cinematic photorealistic dark ancient goddess Lilith, long flowing black wavy hair, intense dark eyes, elegant black and deep violet jeweled gown, intricate gold body jewelry, crescent and serpent symbolism, black iridescent serpent nearby, gothic celestial temple, purple plasma illumination, gold candlelight, realistic skin texture, natural facial anatomy, dramatic cinematic portrait lighting, regal feminine presence, mature adult woman, dark fantasy realism, ultra-detailed, no cartoon, no anime.</div>
+    <button class="btn" data-copy="promptLilith">Copy Lilith Prompt</button>
+
+    <h3>Eve Prompt</h3>
+    <div class="prompt-box" id="promptEve">Cinematic photorealistic radiant goddess Eve, long flowing warm blonde hair, gentle luminous expression, ivory and white-gold jeweled gown, floral crown, delicate gold jewelry, white serpent nearby, luminous sacred garden and crystal temple, warm golden sunlight, pearlescent glow, realistic skin texture, natural facial anatomy, regal feminine presence, mature adult woman, ethereal fantasy realism, ultra-detailed, no cartoon, no anime.</div>
+    <button class="btn eve" data-copy="promptEve">Copy Eve Prompt</button>
+
+    <h3>Couple Prompt</h3>
+    <div class="prompt-box" id="promptCouple">Cinematic photorealistic Lilith and Eve as romantic goddess partners, Lilith with long black wavy hair in black and violet jeweled clothing beside Eve with long golden blonde hair in ivory and gold, affectionate intimate eye contact, hands touching, black serpent behind Lilith, white serpent behind Eve, celestial garden merging with gothic temple, violet and golden energy meeting between them, realistic adult women, natural anatomy, realistic faces and skin, elegant sensuality without explicit sexual content, fantasy realism, cinematic lighting.</div>
+    <button class="btn secondary" data-copy="promptCouple">Copy Couple Prompt</button>
+  </div>
+
+  <div class="card">
+    <h2>Scene-Based Prompts</h2>
+    <p class="small-note">Generated from your current script's first few lines and gesture metadata.</p>
+    <button class="btn" id="genVideoPromptBtn">COPY CLAUDE VIDEO PROMPT</button>
+    <button class="btn eve" id="genTalkingHeadBtn">COPY TALKING-HEAD PROMPT</button>
+    <div class="prompt-box" id="scenePromptOut">Generated prompt will appear here.</div>
+  </div>
+</section>
+
+<!-- ============ AUDIO TAB ============ -->
+<section class="tabpanel" id="tab-audio">
+  <div class="card">
+    <h2>Voice (Web Speech API)</h2>
+    <p class="small-note" id="voiceSupportNote"></p>
+    <div class="grid2">
+      <div>
+        <label for="lilithVoice">Lilith Voice</label>
+        <select id="lilithVoice"></select>
+        <label for="lilithPitch">Lilith Pitch (<span id="lilithPitchVal">0.85</span>)</label>
+        <input type="range" id="lilithPitch" min="0.5" max="1.5" step="0.05" value="0.85">
+        <label for="lilithRate">Lilith Rate (<span id="lilithRateVal">0.95</span>)</label>
+        <input type="range" id="lilithRate" min="0.6" max="1.4" step="0.05" value="0.95">
+      </div>
+      <div>
+        <label for="eveVoice">Eve Voice</label>
+        <select id="eveVoice"></select>
+        <label for="evePitch">Eve Pitch (<span id="evePitchVal">1.05</span>)</label>
+        <input type="range" id="evePitch" min="0.5" max="1.5" step="0.05" value="1.05">
+        <label for="eveRate">Eve Rate (<span id="eveRateVal">1.0</span>)</label>
+        <input type="range" id="eveRate" min="0.6" max="1.4" step="0.05" value="1.0">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Ambient Atmosphere (Web Audio API)</h2>
+    <label><input type="checkbox" id="ambientToggle" style="width:auto;min-height:auto;"> Ambient Audio ON</label>
+    <label for="ambientIntensity">Intensity (<span id="intensityVal">0.3</span>)</label>
+    <input type="range" id="ambientIntensity" min="0" max="1" step="0.05" value="0.3">
+    <div class="grid2">
+      <div>
+        <label for="lilithAtmo">Lilith Atmosphere</label>
+        <select id="lilithAtmo">
+          <option value="drone">Low cosmic drone</option>
+          <option value="temple">Dark temple ambience</option>
+          <option value="thunder">Distant thunder texture</option>
+          <option value="cavern">Cavernous reverb feel</option>
+        </select>
+      </div>
+      <div>
+        <label for="eveAtmo">Eve Atmosphere</label>
+        <select id="eveAtmo">
+          <option value="celestial">Warm celestial ambience</option>
+          <option value="chime">Soft chime texture</option>
+          <option value="garden">Garden atmosphere</option>
+          <option value="hum">Gentle luminous hum</option>
+        </select>
+      </div>
+    </div>
+    <p class="small-note">Ambience is generated in-browser with oscillators and filtered noise — no audio files required. Dialogue (Web Speech) remains the dominant sound; ambience fades in and out smoothly to avoid clicks.</p>
+  </div>
+</section>
+
+<!-- ============ SAVES TAB ============ -->
+<section class="tabpanel" id="tab-saves">
+  <div class="card">
+    <h2>Save System (localStorage)</h2>
+    <button class="btn" id="saveRantBtn">SAVE RANT</button>
+    <button class="btn secondary" id="newRantBtn">NEW RANT</button>
+    <button class="btn secondary" id="duplicateRantBtn">DUPLICATE RANT</button>
+    <button class="btn danger" id="resetDefaultBtn">RESET DEFAULT EPISODE</button>
+    <p class="small-note">Saved Rants — tap to load:</p>
+    <div class="rant-list" id="rantList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Exports</h2>
+    <button class="btn" id="exportTxtBtn">EXPORT SCRIPT TXT</button>
+    <button class="btn secondary" id="exportJsonBtn">EXPORT JSON</button>
+    <p class="small-note">TXT exports the dialogue only. JSON exports the full project (settings, gestures, voices, atmosphere, saved portraits if small enough).</p>
+  </div>
+</section>
+
+<!-- ============ ABOUT TAB ============ -->
+<section class="tabpanel" id="tab-about">
+  <details>
+    <summary>WHAT THIS RANT IS ACTUALLY ARGUING</summary>
+    <p>Tropical astrology uses a twelve-part seasonal zodiac anchored to the equinoxes and solstices. Astronomical constellations are irregular regions of the sky. The Sun's apparent annual path crosses the astronomical constellation Ophiuchus as well as the traditional twelve zodiac constellations. A 13-sign constellation-based astrology system uses those astronomical regions as an alternative astrological framework.</p>
+    <p>Astrology itself is not established as a scientific method for predicting personality or events. This project explores a constellation-based astrological philosophy and creative mythology.</p>
+  </details>
+
+  <details>
+    <summary>FREE LOCAL VIDEO OPTIONS</summary>
+    <p>This page is the control panel, script editor, preview studio, and prompt generator. It does not itself produce a finished talking-head video. For that, you could optionally use separate free/local tools:</p>
+    <p>• LivePortrait — portrait animation from a still image<br>
+    • SadTalker — talking-head animation driven by audio<br>
+    • Piper — offline text-to-speech<br>
+    • Coqui TTS — offline text-to-speech, if compatible with your system<br>
+    • FFmpeg — final video/audio assembly<br>
+    • MoviePy — optional Python-based assembly route<br>
+    • OBS — simple screen-recording fallback for capturing this preview</p>
+    <p>These tools are entirely optional. This page opens and works fully without them.</p>
+  </details>
+
+  <details open>
+    <summary>Character Reference Notes</summary>
+    <p><strong>Lilith:</strong> mature adult woman, long black wavy hair, intense dark eyes, regal ancient-goddess presence, black and deep-violet jeweled clothing, gold jewelry, crescent and serpent symbolism, gothic celestial temple, purple plasma illumination, gold candlelight. Fiery, sarcastic, ancient, intelligent, dramatic, brutally funny, sensual without explicit sexuality, passionate about truth, softens visibly toward Eve.</p>
+    <p><strong>Eve:</strong> mature adult woman, long warm blonde hair, soft luminous expression, ivory/white/gold jeweled clothing, flowers and garden details, gold jewelry, luminous sacred garden, crystal temple, warm golden-white lighting. Warm, grounded, witty, loving, deadpan, playful, emotionally secure — one of the only people who can calm Lilith without silencing her.</p>
+    <p>Their worlds blend where they meet: Lilith's violet gothic temple + Eve's golden sacred garden — violet night meeting golden dawn. They are established romantic partners; intimacy should read as natural and affectionate, never explicit or exaggerated.</p>
+  </details>
+</section>
+
+</main>
+
+<footer>Lilith Rant Studio — single-file, local-first, no backend. Everything runs in your browser.</footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- DEFAULT EPISODE ---------------- */
+function defaultRant(){
+  return {
+    title: "Tropical Astrology Is a Fake Weather Report",
+    lilithName: "Lilith",
+    eveName: "Eve",
+    lines: [
+      {speaker:"lilith", text:"You poor little priest of the twelve boxes. Still standing beneath a thirteen-constellation sky, clutching your tidy wheel like a frightened bureaucrat clutching an outdated manual. Adorable.", gesture:"looks at camera", shot:"close-up", pause:900},
+      {speaker:"lilith", text:"Tropical astrology is not the sky. It is a symbolic seasonal system, anchored to the equinoxes and solstices — a calendar wearing a crown.", gesture:"no gesture", shot:"medium", pause:600},
+      {speaker:"eve", text:"Lilith.", gesture:"soft smile", shot:"close-up", pause:400},
+      {speaker:"lilith", text:"I'm getting there. Saturn did not file a complaint. Nobody in the actual sky is upset about this. I am upset about this.", gesture:"eyebrow raise", shot:"medium", pause:700},
+      {speaker:"lilith", text:"Thirteen women are standing in the room. The spreadsheet only has twelve rows. And instead of fixing the spreadsheet, you tell one of them she doesn't exist.", gesture:"lean closer", shot:"close-up", pause:800},
+      {speaker:"eve", text:"That's Ophiuchus you're defending, not a metaphor, but sure — keep going.", gesture:"Eve suppresses laughter", shot:"two-shot", pause:500},
+      {speaker:"lilith", text:"Ophiuchus did not appear because of TikTok. It has been sitting in that exact patch of sky since before your ancestors learned to write. NASA did not climb into the heavens with a Sharpie and redraw the borders.", gesture:"no gesture", shot:"medium", pause:700},
+      {speaker:"lilith", text:"The constellations are uneven. Virgo sprawls across the sky like she owns the place. Scorpio is compact, precise, minding her business. Nature did not agree to your homeowners association bylaws.", gesture:"hand on arm", shot:"wide", pause:700},
+      {speaker:"eve", text:"The universe is not working for your homeowners association, darling.", gesture:"Eve adjusts Lilith's necklace", shot:"two-shot", pause:600},
+      {speaker:"lilith", text:"Thank you. Let us fix God's formatting. A thirteen-sign, constellation-based system does not require a $799 astrology mentorship bundle. It requires you to look up.", gesture:"Lilith softens toward Eve", shot:"close-up", pause:800},
+      {speaker:"lilith", text:"Ancient observers watched, corrected, argued, recalculated. That is the actual tradition. You inherited the argument and mistook it for a museum piece. You preserved the skin and lost the animal.", gesture:"quiet pause", shot:"close-up", pause:1000},
+      {speaker:"eve", text:"And that's why we don't invite tropical astrologers to dinner, darling.", gesture:"Lilith gives Eve a side-eye", shot:"two-shot", pause:600},
+      {speaker:"lilith", text:"I married the serpent woman's favorite line and I'm using it as the outro. Look up. Recount. Adjust. The sky was never asking to be filed in twelve equal boxes.", gesture:"eye contact", shot:"close-up", pause:900}
+    ],
+    voice:{
+      lilithVoiceName:"", lilithPitch:0.85, lilithRate:0.95,
+      eveVoiceName:"", evePitch:1.05, eveRate:1.0
+    },
+    atmosphere:{ambient:false, intensity:0.3, lilithAtmo:"drone", eveAtmo:"celestial"},
+    images:{lilith:null, eve:null},
+    savedAt:null
+  };
+}
+
+let rant = null;
+let currentIndex = 0;
+let playing = false;
+let playTimer = null;
+
+/* ---------------- STORAGE HELPERS ---------------- */
+const STORAGE_INDEX_KEY = "lilithRantStudio_index";
+const STORAGE_PREFIX = "lilithRantStudio_rant_";
+
+function listSavedTitles(){
+  try{
+    const raw = localStorage.getItem(STORAGE_INDEX_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function setSavedTitles(arr){
+  try{ localStorage.setItem(STORAGE_INDEX_KEY, JSON.stringify(arr)); }catch(e){}
+}
+function saveCurrentRant(){
+  rant.savedAt = new Date().toISOString();
+  try{
+    localStorage.setItem(STORAGE_PREFIX + rant.title, JSON.stringify(rant));
+    const titles = listSavedTitles();
+    if(!titles.includes(rant.title)){ titles.push(rant.title); setSavedTitles(titles); }
+    renderRantList();
+    alert("Saved: " + rant.title);
+  }catch(e){
+    alert("Could not save — storage may be full (large images can exceed browser localStorage limits). Try removing portrait images or shortening the script.");
+  }
+}
+function loadRantByTitle(title){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + title);
+    if(!raw){ alert("No saved rant found with that title."); return; }
+    rant = JSON.parse(raw);
+    currentIndex = 0;
+    syncUIFromRant();
+  }catch(e){ alert("Could not load that rant."); }
+}
+
+/* ---------------- UI: TABS ---------------- */
+document.getElementById("tabNav").addEventListener("click", function(e){
+  const btn = e.target.closest("button[data-tab]");
+  if(!btn) return;
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll("section.tabpanel").forEach(p=>p.classList.remove("active"));
+  document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+});
+
+/* ---------------- STUDIO: LINES ---------------- */
+function renderLines(){
+  const list = document.getElementById("lineList");
+  list.innerHTML = "";
+  rant.lines.forEach((line, i)=>{
+    const row = document.createElement("div");
+    row.className = "line-row " + line.speaker;
+    const speakerLabel = line.speaker === "lilith" ? (rant.lilithName || "Lilith") : (rant.eveName || "Eve");
+
+    const head = document.createElement("div");
+    head.className = "line-head";
+    head.innerHTML = `<strong>${i+1}. ${speakerLabel}</strong>`;
+    const controls = document.createElement("div");
+    controls.className = "row-controls";
+    controls.innerHTML = `
+      <button class="btn secondary" data-act="up" data-i="${i}">↑</button>
+      <button class="btn secondary" data-act="down" data-i="${i}">↓</button>
+      <button class="btn danger" data-act="del" data-i="${i}">✕</button>`;
+    head.appendChild(controls);
+    row.appendChild(head);
+
+    const textArea = document.createElement("textarea");
+    textArea.value = line.text;
+    textArea.dataset.i = i;
+    textArea.dataset.field = "text";
+    row.appendChild(textArea);
+
+    const metaGrid = document.createElement("div");
+    metaGrid.className = "grid2";
+
+    const gestureSel = document.createElement("select");
+    gestureSel.dataset.i = i; gestureSel.dataset.field="gesture";
+    GESTURES.forEach(g=>{
+      const opt = document.createElement("option");
+      opt.value = g; opt.textContent = g;
+      if(g === line.gesture) opt.selected = true;
+      gestureSel.appendChild(opt);
+    });
+    const gWrap = document.createElement("div");
+    gWrap.innerHTML = "<label>Gesture</label>";
+    gWrap.appendChild(gestureSel);
+
+    const shotSel = document.createElement("select");
+    shotSel.dataset.i = i; shotSel.dataset.field = "shot";
+    ["close-up","medium","wide","two-shot"].forEach(s=>{
+      const opt = document.createElement("option");
+      opt.value = s; opt.textContent = s;
+      if(s === line.shot) opt.selected = true;
+      shotSel.appendChild(opt);
+    });
+    const sWrap = document.createElement("div");
+    sWrap.innerHTML = "<label>Shot</label>";
+    sWrap.appendChild(shotSel);
+
+    metaGrid.appendChild(gWrap);
+    metaGrid.appendChild(sWrap);
+    row.appendChild(metaGrid);
+
+    const pauseWrap = document.createElement("div");
+    pauseWrap.innerHTML = `<label>Pause after line (ms)</label>`;
+    const pauseInput = document.createElement("input");
+    pauseInput.type = "number"; pauseInput.min = "0"; pauseInput.step = "100";
+    pauseInput.value = line.pause || 500;
+    pauseInput.dataset.i = i; pauseInput.dataset.field = "pause";
+    pauseWrap.appendChild(pauseInput);
+    row.appendChild(pauseWrap);
+
+    list.appendChild(row);
+  });
+}
+
+const GESTURES = ["eye contact","soft smile","eyebrow raise","Eve adjusts Lilith's necklace",
+  "Eve adjusts Lilith's collar","Eve brushes Lilith's hair aside","hand on arm","hand touch",
+  "lean closer","Lilith softens toward Eve","Lilith gives Eve a side-eye","Eve suppresses laughter",
+  "Eve sips tea","Eve looks at camera","Lilith looks at camera","quiet pause","no gesture"];
+
+document.getElementById("lineList").addEventListener("input", function(e){
+  const t = e.target;
+  const i = t.dataset.i;
+  if(i === undefined) return;
+  const field = t.dataset.field;
+  if(field === "pause"){ rant.lines[i].pause = parseInt(t.value||"0",10); }
+  else { rant.lines[i][field] = t.value; }
+});
+
+document.getElementById("lineList").addEventListener("click", function(e){
+  const btn = e.target.closest("button[data-act]");
+  if(!btn) return;
+  const i = parseInt(btn.dataset.i,10);
+  const act = btn.dataset.act;
+  if(act === "del"){
+    rant.lines.splice(i,1);
+  } else if(act === "up" && i > 0){
+    [rant.lines[i-1], rant.lines[i]] = [rant.lines[i], rant.lines[i-1]];
+  } else if(act === "down" && i < rant.lines.length-1){
+    [rant.lines[i+1], rant.lines[i]] = [rant.lines[i], rant.lines[i+1]];
+  }
+  renderLines();
+});
+
+document.getElementById("addLilithLine").addEventListener("click", function(){
+  rant.lines.push({speaker:"lilith", text:"New Lilith line.", gesture:"no gesture", shot:"medium", pause:600});
+  renderLines();
+});
+document.getElementById("addEveLine").addEventListener("click", function(){
+  rant.lines.push({speaker:"eve", text:"New Eve line.", gesture:"soft smile", shot:"two-shot", pause:500});
+  renderLines();
+});
+
+document.getElementById("rantTitle").addEventListener("input", function(){
+  rant.title = this.value;
+  document.getElementById("appTitleDisplay").textContent = "LILITH RANT STUDIO";
+});
+document.getElementById("lilithName").addEventListener("input", function(){ rant.lilithName = this.value; renderLines(); });
+document.getElementById("eveName").addEventListener("input", function(){ rant.eveName = this.value; renderLines(); });
+
+/* ---------------- PREVIEW ---------------- */
+function readFileAsDataURL(file, cb){
+  const reader = new FileReader();
+  reader.onload = function(){ cb(reader.result); };
+  reader.onerror = function(){ alert("Could not read that image file."); };
+  reader.readAsDataURL(file);
+}
+
+document.getElementById("lilithImg").addEventListener("change", function(){
+  if(this.files && this.files[0]){
+    readFileAsDataURL(this.files[0], function(dataUrl){
+      rant.images.lilith = dataUrl;
+      renderPortraits();
+    });
+  }
+});
+document.getElementById("eveImg").addEventListener("change", function(){
+  if(this.files && this.files[0]){
+    readFileAsDataURL(this.files[0], function(dataUrl){
+      rant.images.eve = dataUrl;
+      renderPortraits();
+    });
+  }
+});
+
+function renderPortraits(){
+  const lSlot = document.getElementById("lilithSlot");
+  const eSlot = document.getElementById("eveSlot");
+  lSlot.innerHTML = rant.images.lilith ? `<img src="${rant.images.lilith}" alt="Lilith portrait">` : `<span class="small-note">Lilith</span>`;
+  eSlot.innerHTML = rant.images.eve ? `<img src="${rant.images.eve}" alt="Eve portrait">` : `<span class="small-note">Eve</span>`;
+}
+
+function updateCaption(){
+  const line = rant.lines[currentIndex];
+  if(!line){
+    document.getElementById("capSpeaker").textContent = "—";
+    document.getElementById("capText").textContent = "End of scene.";
+    document.getElementById("capGesture").textContent = "";
+    return;
+  }
+  const speakerName = line.speaker === "lilith" ? (rant.lilithName||"Lilith") : (rant.eveName||"Eve");
+  document.getElementById("capSpeaker").textContent = speakerName;
+  document.getElementById("capText").textContent = line.text;
+  document.getElementById("capGesture").textContent = line.gesture && line.gesture !== "no gesture" ? "(" + line.gesture + ")" : "";
+
+  const lSlot = document.getElementById("lilithSlot");
+  const eSlot = document.getElementById("eveSlot");
+  lSlot.classList.remove("speaking","dim");
+  eSlot.classList.remove("speaking","dim");
+  if(line.speaker === "lilith"){ lSlot.classList.add("speaking"); eSlot.classList.add("dim"); }
+  else { eSlot.classList.add("speaking"); lSlot.classList.add("dim"); }
+}
+
+function speakLine(line, onDone){
+  if(!("speechSynthesis" in window)){ onDone(); return; }
+  const utter = new SpeechSynthesisUtterance(line.text);
+  const voices = speechSynthesis.getVoices();
+  if(line.speaker === "lilith"){
+    utter.pitch = rant.voice.lilithPitch; utter.rate = rant.voice.lilithRate;
+    const v = voices.find(v=>v.name === rant.voice.lilithVoiceName);
+    if(v) utter.voice = v;
+  } else {
+    utter.pitch = rant.voice.evePitch; utter.rate = rant.voice.eveRate;
+    const v = voices.find(v=>v.name === rant.voice.eveVoiceName);
+    if(v) utter.voice = v;
+  }
+  utter.onend = onDone;
+  utter.onerror = onDone;
+  speechSynthesis.speak(utter);
+}
+
+function playScene(){
+  if(playing) return;
+  playing = true;
+  stepPlay();
+}
+function stepPlay(){
+  if(!playing) return;
+  const line = rant.lines[currentIndex];
+  if(!line){ playing = false; updateCaption(); return; }
+  updateCaption();
+  speakLine(line, function(){
+    if(!playing) return;
+    playTimer = setTimeout(function(){
+      if(!playing) return;
+      currentIndex++;
+      stepPlay();
+    }, line.pause || 500);
+  });
+}
+document.getElementById("playBtn").addEventListener("click", playScene);
+document.getElementById("pauseBtn").addEventListener("click", function(){
+  playing = false;
+  if("speechSynthesis" in window) speechSynthesis.pause();
+  clearTimeout(playTimer);
+});
+document.getElementById("stopBtn").addEventListener("click", function(){
+  playing = false;
+  clearTimeout(playTimer);
+  if("speechSynthesis" in window) speechSynthesis.cancel();
+  currentIndex = 0;
+  updateCaption();
+});
+document.getElementById("prevLineBtn").addEventListener("click", function(){
+  playing = false; clearTimeout(playTimer);
+  if("speechSynthesis" in window) speechSynthesis.cancel();
+  currentIndex = Math.max(0, currentIndex-1);
+  updateCaption();
+});
+document.getElementById("nextLineBtn").addEventListener("click", function(){
+  playing = false; clearTimeout(playTimer);
+  if("speechSynthesis" in window) speechSynthesis.cancel();
+  currentIndex = Math.min(rant.lines.length-1, currentIndex+1);
+  updateCaption();
+});
+
+/* ---------------- VOICES ---------------- */
+function populateVoiceLists(){
+  if(!("speechSynthesis" in window)){
+    document.getElementById("voiceSupportNote").textContent = "Web Speech API voice list is not available in this browser. Text captions will still work.";
+    return;
+  }
+  document.getElementById("voiceSupportNote").textContent = "Voices are provided by your browser/OS and vary by device.";
+  const voices = speechSynthesis.getVoices();
+  const lSel = document.getElementById("lilithVoice");
+  const eSel = document.getElementById("eveVoice");
+  if(voices.length === 0) return;
+  lSel.innerHTML = ""; eSel.innerHTML = "";
+  voices.forEach(v=>{
+    const o1 = document.createElement("option"); o1.value = v.name; o1.textContent = v.name + " (" + v.lang + ")";
+    const o2 = o1.cloneNode(true);
+    lSel.appendChild(o1); eSel.appendChild(o2);
+  });
+  if(rant.voice.lilithVoiceName) lSel.value = rant.voice.lilithVoiceName;
+  if(rant.voice.eveVoiceName) eSel.value = rant.voice.eveVoiceName;
+  rant.voice.lilithVoiceName = lSel.value;
+  rant.voice.eveVoiceName = eSel.value;
+}
+if("speechSynthesis" in window){
+  speechSynthesis.onvoiceschanged = populateVoiceLists;
+}
+
+["lilithVoice","eveVoice"].forEach(id=>{
+  document.getElementById(id).addEventListener("change", function(){
+    if(id === "lilithVoice") rant.voice.lilithVoiceName = this.value;
+    else rant.voice.eveVoiceName = this.value;
+  });
+});
+function bindRange(id, valId, cb){
+  document.getElementById(id).addEventListener("input", function(){
+    document.getElementById(valId).textContent = this.value;
+    cb(parseFloat(this.value));
+  });
+}
+bindRange("lilithPitch","lilithPitchVal", v=>rant.voice.lilithPitch=v);
+bindRange("lilithRate","lilithRateVal", v=>rant.voice.lilithRate=v);
+bindRange("evePitch","evePitchVal", v=>rant.voice.evePitch=v);
+bindRange("eveRate","eveRateVal", v=>rant.voice.eveRate=v);
+
+/* ---------------- WEB AUDIO AMBIENCE ---------------- */
+let audioCtx = null;
+let masterGain = null;
+let lilithNodes = null;
+let eveNodes = null;
+
+function ensureAudioCtx(){
+  if(!audioCtx){
+    try{
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0;
+      masterGain.connect(audioCtx.destination);
+    }catch(e){ return false; }
+  }
+  return true;
+}
+
+function buildNoiseBuffer(){
+  const bufferSize = audioCtx.sampleRate * 2;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i=0;i<bufferSize;i++){ data[i] = Math.random()*2-1; }
+  return buffer;
+}
+
+function startAtmosphere(kind, target){
+  if(!ensureAudioCtx()) return null;
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.0001;
+  gain.connect(masterGain);
+
+  const nodes = {gain:gain, sources:[]};
+
+  if(kind === "drone" || kind === "cavern"){
+    const osc = audioCtx.createOscillator();
+    osc.type = "sine"; osc.frequency.value = kind === "drone" ? 60 : 45;
+    const osc2 = audioCtx.createOscillator();
+    osc2.type = "sine"; osc2.frequency.value = kind === "drone" ? 90 : 68;
+    osc.connect(gain); osc2.connect(gain);
+    osc.start(); osc2.start();
+    nodes.sources.push(osc, osc2);
+  } else if(kind === "temple"){
+    const osc = audioCtx.createOscillator();
+    osc.type = "triangle"; osc.frequency.value = 110;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "lowpass"; filter.frequency.value = 400;
+    osc.connect(filter); filter.connect(gain);
+    osc.start();
+    nodes.sources.push(osc);
+  } else if(kind === "thunder"){
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buildNoiseBuffer(); noise.loop = true;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "lowpass"; filter.frequency.value = 120;
+    noise.connect(filter); filter.connect(gain);
+    noise.start();
+    nodes.sources.push(noise);
+  } else if(kind === "celestial" || kind === "hum"){
+    const osc = audioCtx.createOscillator();
+    osc.type = "sine"; osc.frequency.value = kind === "celestial" ? 440 : 330;
+    const osc2 = audioCtx.createOscillator();
+    osc2.type = "sine"; osc2.frequency.value = (kind === "celestial" ? 440 : 330) * 1.5;
+    osc.connect(gain); osc2.connect(gain);
+    osc.start(); osc2.start();
+    nodes.sources.push(osc, osc2);
+  } else if(kind === "chime"){
+    const osc = audioCtx.createOscillator();
+    osc.type = "sine"; osc.frequency.value = 880;
+    const lfo = audioCtx.createOscillator();
+    lfo.frequency.value = 0.2;
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = 200;
+    lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
+    osc.connect(gain);
+    osc.start(); lfo.start();
+    nodes.sources.push(osc, lfo);
+  } else if(kind === "garden"){
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buildNoiseBuffer(); noise.loop = true;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "highpass"; filter.frequency.value = 3000;
+    noise.connect(filter); filter.connect(gain);
+    noise.start();
+    nodes.sources.push(noise);
+  }
+
+  const target_gain = Math.max(0.0001, (rant.atmosphere.intensity||0.3) * 0.15);
+  gain.gain.exponentialRampToValueAtTime(target_gain, audioCtx.currentTime + 1.5);
+  return nodes;
+}
+
+function stopAtmosphere(nodes){
+  if(!nodes) return;
+  try{
+    nodes.gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.0);
+    setTimeout(()=>{ nodes.sources.forEach(s=>{ try{ s.stop(); }catch(e){} }); }, 1100);
+  }catch(e){}
+}
+
+function applyAmbienceState(){
+  if(!ensureAudioCtx()) return;
+  if(rant.atmosphere.ambient){
+    masterGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, rant.atmosphere.intensity), audioCtx.currentTime + 1.0);
+    if(!lilithNodes) lilithNodes = startAtmosphere(rant.atmosphere.lilithAtmo);
+    if(!eveNodes) eveNodes = startAtmosphere(rant.atmosphere.eveAtmo);
+  } else {
+    masterGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.0);
+    stopAtmosphere(lilithNodes); lilithNodes = null;
+    stopAtmosphere(eveNodes); eveNodes = null;
+  }
+}
+
+document.getElementById("ambientToggle").addEventListener("change", function(){
+  rant.atmosphere.ambient = this.checked;
+  applyAmbienceState();
+});
+document.getElementById("ambientIntensity").addEventListener("input", function(){
+  rant.atmosphere.intensity = parseFloat(this.value);
+  document.getElementById("intensityVal").textContent = this.value;
+  if(rant.atmosphere.ambient && audioCtx){
+    masterGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, rant.atmosphere.intensity), audioCtx.currentTime + 0.5);
+  }
+});
+document.getElementById("lilithAtmo").addEventListener("change", function(){
+  rant.atmosphere.lilithAtmo = this.value;
+  if(rant.atmosphere.ambient){ stopAtmosphere(lilithNodes); lilithNodes = startAtmosphere(this.value); }
+});
+document.getElementById("eveAtmo").addEventListener("change", function(){
+  rant.atmosphere.eveAtmo = this.value;
+  if(rant.atmosphere.ambient){ stopAtmosphere(eveNodes); eveNodes = startAtmosphere(this.value); }
+});
+
+/* ---------------- PROMPTS ---------------- */
+document.querySelectorAll("[data-copy]").forEach(btn=>{
+  btn.addEventListener("click", function(){
+    const text = document.getElementById(this.dataset.copy).textContent;
+    copyToClipboard(text, this);
+  });
+});
+
+function copyToClipboard(text, btn){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>flashCopied(btn)).catch(()=>fallbackCopy(text,btn));
+  } else {
+    fallbackCopy(text, btn);
+  }
+}
+function fallbackCopy(text, btn){
+  const ta = document.createElement("textarea");
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); flashCopied(btn); }catch(e){ alert("Copy failed — please select and copy manually."); }
+  document.body.removeChild(ta);
+}
+function flashCopied(btn){
+  if(!btn) return;
+  const original = btn.textContent;
+  btn.textContent = "Copied ✓";
+  setTimeout(()=>{ btn.textContent = original; }, 1400);
+}
+
+document.getElementById("genVideoPromptBtn").addEventListener("click", function(){
+  const firstLines = rant.lines.slice(0,4).map(l=>{
+    const speaker = l.speaker === "lilith" ? (rant.lilithName||"Lilith") : (rant.eveName||"Eve");
+    return `${speaker} (${l.shot}, ${l.gesture}): "${l.text}"`;
+  }).join("\n");
+  const out = `Scene: "${rant.title}"\n\nCinematic photorealistic fantasy short-form video scene. Lilith: long black wavy hair, black and deep-violet jeweled gown, gold jewelry, gothic celestial temple, purple plasma illumination, gold candlelight. Eve: long warm blonde hair, ivory and gold jeweled clothing, luminous sacred garden, warm golden lighting. They are affectionate established romantic partners; intimacy is warm and understated, never explicit. Natural adult anatomy, realistic skin texture, no cartoon, no anime.\n\nShot sequence:\n${firstLines}\n\nMaintain consistent identity, hairstyle, and jewelry across shots. Realistic blinking and breathing. Restrained, natural gesture timing matching the noted gestures above.`;
+  document.getElementById("scenePromptOut").textContent = out;
+  copyToClipboard(out, document.getElementById("genVideoPromptBtn"));
+});
+
+document.getElementById("genTalkingHeadBtn").addEventListener("click", function(){
+  const out = `Talking-head animation prompt for uploaded portrait(s).\n\nAnimate with: realistic blinking, natural breathing, subtle head movement, accurate lip sync, restrained facial motion. Preserve identity, hairstyle, and jewelry exactly. Preserve original lighting. No face warping, no exaggerated mouth motion, no rubbery skin, no cartoon or anime-style movement, no sudden camera jumps. Cinematic realism throughout.\n\nFor couple scenes: include subtle eye contact between Lilith and Eve, natural pauses, small affectionate gestures (per the gesture metadata on each line), realistic reaction timing — Eve should visibly react while Lilith speaks, and Lilith should occasionally soften when looking at Eve, without breaking the pace of the rant.\n\nNote: standalone browser HTML cannot generate this animation itself — use this prompt with an external portrait-animation tool (see Free Local Video Options).`;
+  document.getElementById("scenePromptOut").textContent = out;
+  copyToClipboard(out, document.getElementById("genTalkingHeadBtn"));
+});
+
+/* ---------------- SAVE / EXPORT ---------------- */
+document.getElementById("saveRantBtn").addEventListener("click", saveCurrentRant);
+
+document.getElementById("newRantBtn").addEventListener("click", function(){
+  if(!confirm("Start a new blank rant? Unsaved changes to the current rant will be lost.")) return;
+  rant = {
+    title: "Lilith Rant #" + (listSavedTitles().length + 1),
+    lilithName: "Lilith", eveName: "Eve",
+    lines: [{speaker:"lilith", text:"New rant. Say something ancient.", gesture:"no gesture", shot:"medium", pause:600}],
+    voice:{lilithVoiceName:"", lilithPitch:0.85, lilithRate:0.95, eveVoiceName:"", evePitch:1.05, eveRate:1.0},
+    atmosphere:{ambient:false, intensity:0.3, lilithAtmo:"drone", eveAtmo:"celestial"},
+    images:{lilith:null, eve:null}, savedAt:null
+  };
+  currentIndex = 0;
+  syncUIFromRant();
+});
+
+document.getElementById("duplicateRantBtn").addEventListener("click", function(){
+  const copy = JSON.parse(JSON.stringify(rant));
+  copy.title = rant.title + " (copy)";
+  rant = copy;
+  document.getElementById("rantTitle").value = rant.title;
+  saveCurrentRant();
+});
+
+document.getElementById("resetDefaultBtn").addEventListener("click", function(){
+  if(!confirm("Reset to the default astrology episode? Unsaved changes will be lost.")) return;
+  rant = defaultRant();
+  currentIndex = 0;
+  syncUIFromRant();
+});
+
+function renderRantList(){
+  const wrap = document.getElementById("rantList");
+  const titles = listSavedTitles();
+  wrap.innerHTML = "";
+  if(titles.length === 0){
+    wrap.innerHTML = '<span class="small-note">No saved rants yet.</span>';
+    return;
+  }
+  titles.forEach(t=>{
+    const chip = document.createElement("span");
+    chip.className = "rant-chip" + (t === rant.title ? " current" : "");
+    chip.textContent = t;
+    chip.addEventListener("click", ()=>loadRantByTitle(t));
+    wrap.appendChild(chip);
+  });
+}
+
+function downloadBlob(filename, content, mime){
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+
+document.getElementById("exportTxtBtn").addEventListener("click", function(){
+  let out = rant.title + "\n" + "=".repeat(rant.title.length) + "\n\n";
+  rant.lines.forEach(l=>{
+    const speaker = l.speaker === "lilith" ? (rant.lilithName||"Lilith") : (rant.eveName||"Eve");
+    out += `${speaker.toUpperCase()}: ${l.text}\n`;
+    if(l.gesture && l.gesture !== "no gesture") out += `   [${l.gesture}]\n`;
+    out += "\n";
+  });
+  downloadBlob((rant.title||"rant").replace(/[^a-z0-9\-_ ]/gi,"") + ".txt", out, "text/plain");
+});
+
+document.getElementById("exportJsonBtn").addEventListener("click", function(){
+  downloadBlob((rant.title||"rant").replace(/[^a-z0-9\-_ ]/gi,"") + ".json", JSON.stringify(rant, null, 2), "application/json");
+});
+
+/* ---------------- SYNC ---------------- */
+function syncUIFromRant(){
+  document.getElementById("rantTitle").value = rant.title;
+  document.getElementById("lilithName").value = rant.lilithName;
+  document.getElementById("eveName").value = rant.eveName;
+  document.getElementById("ambientToggle").checked = !!rant.atmosphere.ambient;
+  document.getElementById("ambientIntensity").value = rant.atmosphere.intensity;
+  document.getElementById("intensityVal").textContent = rant.atmosphere.intensity;
+  document.getElementById("lilithAtmo").value = rant.atmosphere.lilithAtmo;
+  document.getElementById("eveAtmo").value = rant.atmosphere.eveAtmo;
+  document.getElementById("lilithPitch").value = rant.voice.lilithPitch;
+  document.getElementById("lilithPitchVal").textContent = rant.voice.lilithPitch;
+  document.getElementById("lilithRate").value = rant.voice.lilithRate;
+  document.getElementById("lilithRateVal").textContent = rant.voice.lilithRate;
+  document.getElementById("evePitch").value = rant.voice.evePitch;
+  document.getElementById("evePitchVal").textContent = rant.voice.evePitch;
+  document.getElementById("eveRate").value = rant.voice.eveRate;
+  document.getElementById("eveRateVal").textContent = rant.voice.eveRate;
+  renderLines();
+  renderPortraits();
+  updateCaption();
+  renderRantList();
+  populateVoiceLists();
+}
+
+/* ---------------- INIT ---------------- */
+function init(){
+  const titles = listSavedTitles();
+  if(titles.length > 0 && localStorage.getItem(STORAGE_PREFIX + titles[titles.length-1])){
+    try{
+      rant = JSON.parse(localStorage.getItem(STORAGE_PREFIX + titles[titles.length-1]));
+    }catch(e){ rant = defaultRant(); }
+  } else {
+    rant = defaultRant();
+  }
+  syncUIFromRant();
+}
+init();
+
+})();
+</script>
+</body>
+</html>
