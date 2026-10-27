@@ -673,6 +673,10 @@ function speakLine(line, onDone){
 
 function playScene(){
   if(playing) return;
+  if("speechSynthesis" in window){
+    speechSynthesis.cancel();
+    speechSynthesis.resume();
+  }
   playing = true;
   stepPlay();
 }
