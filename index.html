@@ -221,6 +221,13 @@
   </div>
 
   <div class="card">
+    <h2>Auto-Generate</h2>
+    <p class="small-note">Writes a full Ophiuchus scene with lines, gestures, shots, and pauses, then builds the video prompt for you. Edit anything afterward.</p>
+    <button class="btn" id="genOphBtn">✦ Generate Ophiuchus Scene</button>
+    <button class="btn secondary" id="genBatchBtn">✦ Generate 3 Clips &amp; Save</button>
+  </div>
+
+  <div class="card">
     <h2>Dialogue Lines</h2>
     <p class="small-note">Each line has a speaker, gesture, shot framing, and an optional pause. Reorder with the arrows. Nothing here is animated video — these are staging notes for your preview and prompt generation.</p>
     <div id="lineList"></div>
@@ -1011,6 +1018,102 @@ document.getElementById("exportTxtBtn").addEventListener("click", function(){
 
 document.getElementById("exportJsonBtn").addEventListener("click", function(){
   downloadBlob((rant.title||"rant").replace(/[^a-z0-9\-_ ]/gi,"") + ".json", JSON.stringify(rant, null, 2), "application/json");
+});
+
+/* ---------------- AUTO-GENERATOR (OPHIUCHUS) ---------------- */
+const OPH_TITLES = [
+  "Ophiuchus Is Not a Typo",
+  "The Thirteenth Sign Nobody Invited",
+  "Ophiuchus, Explained by a Very Tired Goddess",
+  "Thirteen Signs, One Patient Serpent-Holder"
+];
+const OPH_OPENERS = [
+  "You poor little priest of the twelve boxes. Still clutching that tidy wheel like it can outrun the sky.",
+  "Let's talk about Ophiuchus, the constellation your horoscope pretends does not exist.",
+  "Twelve signs. Thirteen constellations. Someone counted wrong, and everyone decided not to look up.",
+  "Ophiuchus has been standing in the same patch of sky since before your calendar existed. Rude of it to be ignored."
+];
+const OPH_FACTS = [
+  "Ophiuchus is one of the eighty-eight constellations recognized by the International Astronomical Union. It is not a rumor. It is not a trend.",
+  "The Sun passes through Ophiuchus in late November and into December. Your tropical chart says the Sun is somewhere else. The Sun disagrees.",
+  "It sits on the celestial equator, between Scorpius and Sagittarius, holding a serpent that stretches out on both sides.",
+  "The tropical zodiac cut the sky into twelve equal thirty-degree slices, anchored to the equinoxes. That is a calendar, not a map of the stars.",
+  "The constellations are uneven. Scorpio is compact. Virgo sprawls. Nature did not consult a homeowners association.",
+  "Ancient observers drew, corrected, argued, and redrew. That argument is the actual tradition."
+];
+const OPH_EVE = [
+  "Ophiuchus, darling. Say the whole name.",
+  "That's a lot of confidence for someone who hasn't checked the sky this week.",
+  "And here I thought you'd finally stop talking about the snake.",
+  "Lilith, the snake is not the problem. The spreadsheet is the problem."
+];
+const OPH_REBUTTALS = [
+  "The sky does not owe your spreadsheet a neat set of boxes. It never did.",
+  "You can keep the twelve equal slices. I'll keep looking up.",
+  "A thirteen-constellation sky does not need a mentorship bundle. It needs one honest look.",
+  "Saturn did not file a complaint. Nobody in the actual sky is upset about this. I am upset about this."
+];
+const OPH_CLOSERS = [
+  "Look up. Recount. Adjust. The sky was never asking to be filed in twelve equal boxes.",
+  "Go outside tonight. Find the snake. Let it correct you.",
+  "Thirteen constellations, one sky, and you are still arguing with the stars. Adorable."
+];
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
+
+function generateOphiuchusEpisode(){
+  const facts = shuffle(OPH_FACTS);
+  const eve = shuffle(OPH_EVE);
+  const beats = [
+    ["lilith", pick(OPH_OPENERS), "looks at camera", "close-up", 900],
+    ["lilith", facts[0], "no gesture", "medium", 700],
+    ["eve", eve[0], "soft smile", "two-shot", 500],
+    ["lilith", facts[1], "eyebrow raise", "medium", 700],
+    ["lilith", pick(OPH_REBUTTALS), "lean closer", "close-up", 800],
+    ["eve", eve[1], "Eve suppresses laughter", "two-shot", 500],
+    ["lilith", facts[2], "hand on arm", "wide", 700],
+    ["lilith", pick(OPH_CLOSERS), "eye contact", "close-up", 1000]
+  ];
+  return {
+    title: pick(OPH_TITLES),
+    lines: beats.map(([speaker, text, gesture, shot, pause]) => ({speaker, text, gesture, shot, pause}))
+  };
+}
+
+function applyGeneratedEpisode(gen){
+  rant.title = gen.title;
+  rant.lines = gen.lines;
+  currentIndex = 0;
+  syncUIFromRant();
+}
+
+document.getElementById("genOphBtn").addEventListener("click", function(){
+  applyGeneratedEpisode(generateOphiuchusEpisode());
+  document.getElementById("genVideoPromptBtn").click();
+});
+
+document.getElementById("genBatchBtn").addEventListener("click", function(){
+  let last = null;
+  for(let n = 0; n < 3; n++){
+    const gen = generateOphiuchusEpisode();
+    const saved = listSavedTitles();
+    let title = gen.title, k = 2;
+    while(saved.includes(title)){ title = gen.title + " #" + k++; }
+    last = Object.assign({}, rant, {title: title, lines: gen.lines, savedAt: new Date().toISOString()});
+    try{
+      localStorage.setItem(STORAGE_PREFIX + title, JSON.stringify(last));
+      saved.push(title);
+      setSavedTitles(saved);
+    }catch(e){
+      alert("Storage is full. Generated clips were not all saved.");
+      break;
+    }
+  }
+  rant = last;
+  currentIndex = 0;
+  syncUIFromRant();
+  alert("Generated and saved 3 Ophiuchus clips. Open Save / Export to load any of them.");
 });
 
 /* ---------------- SYNC ---------------- */
