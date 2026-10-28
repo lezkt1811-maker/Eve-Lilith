@@ -459,17 +459,30 @@ function listSavedTitles(){
 function setSavedTitles(arr){
   try{ localStorage.setItem(STORAGE_INDEX_KEY, JSON.stringify(arr)); }catch(e){}
 }
+function writeRantToStorage(r){
+  localStorage.setItem(STORAGE_PREFIX + r.title, JSON.stringify(r));
+  const titles = listSavedTitles();
+  if(!titles.includes(r.title)){ titles.push(r.title); setSavedTitles(titles); }
+}
 function saveCurrentRant(){
   rant.savedAt = new Date().toISOString();
+  let note = "";
   try{
-    localStorage.setItem(STORAGE_PREFIX + rant.title, JSON.stringify(rant));
-    const titles = listSavedTitles();
-    if(!titles.includes(rant.title)){ titles.push(rant.title); setSavedTitles(titles); }
-    renderRantList();
-    alert("Saved: " + rant.title);
+    writeRantToStorage(rant);
   }catch(e){
-    alert("Could not save (" + e.name + ": " + e.message + "). Storage may be full — large portrait images can exceed the browser limit. Try removing portrait images, or clear saved rants you no longer need.");
+    // Full save failed (usually large portrait images). Retry without images.
+    try{
+      writeRantToStorage(Object.assign({}, rant, {images:{lilith:null, eve:null}}));
+      note = " (saved without portrait images, since browser storage is limited)";
+    }catch(e2){
+      // Storage refused everything. Download the rant so the work is not lost.
+      downloadBlob((rant.title||"rant").replace(/[^a-z0-9\-_ ]/gi,"") + ".json", JSON.stringify(rant, null, 2), "application/json");
+      alert("Browser storage refused the save, so the rant was downloaded as a JSON file instead. Load it back from Save / Export if needed.");
+      return;
+    }
   }
+  renderRantList();
+  alert("Saved: " + rant.title + note);
 }
 function loadRantByTitle(title){
   try{
