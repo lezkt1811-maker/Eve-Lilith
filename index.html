@@ -468,7 +468,7 @@ function saveCurrentRant(){
     renderRantList();
     alert("Saved: " + rant.title);
   }catch(e){
-    alert("Could not save — storage may be full (large images can exceed browser localStorage limits). Try removing portrait images or shortening the script.");
+    alert("Could not save (" + e.name + ": " + e.message + "). Storage may be full — large portrait images can exceed the browser limit. Try removing portrait images, or clear saved rants you no longer need.");
   }
 }
 function loadRantByTitle(title){
